@@ -7,25 +7,39 @@ const App = () => {
   const [list, setList] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editID, setEditID] = useState(null);
-  const [alert, setAlert] = useState({ show: true, msg: '', type: '' });
+  const [alert, setAlert] = useState({ show: false, msg: '', type: '' });
   
   const handleSubmit = (e) => {
     e.preventDefault();
     if(!name) {
-
+      showAlert(true , 'danger' , 'Please enter Value');
     } else if (name && isEditing) {
-
+      
     } else {
+      showAlert(true , 'success' , 'Item added to the list');
       const newItem = {id: new Date().getTime().toString() , title: name};
       setList([...list, newItem]);
       setName('');
     }
   };
 
+  const showAlert = (show = false, type = '', msg = '') => {
+    setAlert({ show, type, msg });
+  };
+
+  const clearList = () => {
+    showAlert(true,'danger','Empty list');
+    setList([]);
+  };
+
+  const removeItem = (id) => {
+    showAlert(true , 'danger' , 'Item removed');
+    setList(list.filter((item)=> item.id !== id));
+  };
   return (
     <section className="section-center">
       <form className="grocery-form" onSubmit={handleSubmit}>
-        {alert.show && <Alert />}
+        {alert.show && <Alert {...alert} removeAlert={showAlert} list={list}/>}
         <h3>Grocery Bud</h3>
         <div className='form-control'>
           <input
@@ -42,8 +56,8 @@ const App = () => {
       </form>
       {list.length > 0 && (
         <div className="grocery-container">
-          <List items={list}/>
-          <button className="clear-btn">
+          <List items={list} removeItem={removeItem}/>
+          <button className="clear-btn" onClick={clearList}>
             Clear Items
           </button>
         </div>
